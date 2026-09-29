@@ -1,0 +1,6 @@
+{
+  "name": "카메라 인터페이스 아키텍처 비교 대시보드",
+  "description": "GMSL2, MIPI CSI-2, USB 3.0 카메라 인터페이스의 기술 사양, 지연 시간, 대역폭, 기계적 설치성 및 TCO 경제성 심층 비교 대시보드",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
