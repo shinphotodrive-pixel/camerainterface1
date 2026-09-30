@@ -1,1 +1,37 @@
 @import "tailwindcss";
+
+/* Hidden on screen by default */
+#printable-technical-report-container {
+  display: none;
+}
+
+@media print {
+  html, body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Hide root application completely during print */
+  #root {
+    display: none !important;
+  }
+
+  /* Show only the printable container attached to document.body */
+  #printable-technical-report-container {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    padding: 8mm 12mm !important;
+    background: #ffffff !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm;
+  }
+}

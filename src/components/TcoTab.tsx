@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TcoCostChart } from './Charts';
-import { DollarSign, TrendingUp, AlertCircle, Clock, ShieldAlert } from 'lucide-react';
+import { Tco5YearSimulator } from './Tco5YearSimulator';
+import { DollarSign, TrendingUp, AlertCircle, Clock, ShieldAlert, Calculator } from 'lucide-react';
 
 export const TcoTab: React.FC = () => {
   const [cameraCount, setCameraCount] = useState<number>(4);
@@ -117,6 +118,13 @@ export const TcoTab: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* 5-Year TCO Predictive Simulator Component */}
+      <Tco5YearSimulator
+        initialCameraCount={cameraCount}
+        onCameraCountSync={(count) => setCameraCount(count)}
+      />
     </div>
   );
 };
+

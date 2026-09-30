@@ -8,10 +8,11 @@ import {
   Maximize2,
   Cpu,
   CheckCircle2,
-  Info
+  Info,
+  FileDown
 } from 'lucide-react';
 
-interface KeySpecItem {
+export interface KeySpecItem {
   id: string;
   metric: string;
   category: 'bandwidth' | 'distance' | 'power' | 'latency';
@@ -38,7 +39,7 @@ interface KeySpecItem {
   engineeringNote: string;
 }
 
-const SPEC_ROWS: KeySpecItem[] = [
+export const SPEC_ROWS: KeySpecItem[] = [
   {
     id: 'bandwidth',
     metric: '대역폭 (Bandwidth)',
@@ -142,7 +143,13 @@ const SPEC_ROWS: KeySpecItem[] = [
   }
 ];
 
-export const TechnicalSpecSummaryTable: React.FC = () => {
+export interface TechnicalSpecSummaryTableProps {
+  onExportReport?: (interfaces: { mipi: boolean; gmsl: boolean; usb: boolean }) => void;
+}
+
+export const TechnicalSpecSummaryTable: React.FC<TechnicalSpecSummaryTableProps> = ({
+  onExportReport
+}) => {
   const [selectedRowId, setSelectedRowId] = useState<string>('bandwidth');
   const [visibleInterfaces, setVisibleInterfaces] = useState<{
     mipi: boolean;
@@ -271,6 +278,18 @@ export const TechnicalSpecSummaryTable: React.FC = () => {
               className="text-[11px] text-indigo-600 hover:text-indigo-800 font-medium px-2 py-0.5 rounded hover:bg-indigo-50 transition-colors"
             >
               전체 보기
+            </button>
+          )}
+
+          {onExportReport && (
+            <button
+              type="button"
+              onClick={() => onExportReport(visibleInterfaces)}
+              className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-indigo-700 border border-indigo-200 hover:bg-indigo-50 shadow-2xs transition-colors ml-1"
+              title="선택된 인터페이스 기술 사양을 PDF 또는 CSV 보고서로 내보내기"
+            >
+              <FileDown className="w-3.5 h-3.5 text-indigo-600" />
+              <span>보고서 내보내기</span>
             </button>
           )}
         </div>

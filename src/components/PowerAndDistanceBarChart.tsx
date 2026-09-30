@@ -23,7 +23,7 @@ import {
   Filter
 } from 'lucide-react';
 
-interface InterfaceMetricData {
+export interface InterfaceMetricData {
   id: 'mipi' | 'gmsl' | 'usb';
   name: string;
   shortName: string;
@@ -44,7 +44,7 @@ interface InterfaceMetricData {
   powerDelivery: string;
 }
 
-const INTERFACE_BENCHMARK_DATA: InterfaceMetricData[] = [
+export const INTERFACE_BENCHMARK_DATA: InterfaceMetricData[] = [
   {
     id: 'mipi',
     name: 'MIPI CSI-2 (온보드 직결)',

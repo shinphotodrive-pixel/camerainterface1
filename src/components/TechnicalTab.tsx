@@ -2,8 +2,19 @@ import React, { useState, useMemo } from 'react';
 import { LatencyCpuChart, BandwidthRoadmapChart } from './Charts';
 import { TechnicalSpecSummaryTable } from './TechnicalSpecSummaryTable';
 import { PowerAndDistanceBarChart } from './PowerAndDistanceBarChart';
+import { TechnicalReportExportModal } from './TechnicalReportExportModal';
 import { RESOLUTION_OPTIONS, BIT_DEPTH_OPTIONS } from '../data/interfaceData';
-import { Calculator, CheckCircle2, AlertTriangle, XCircle, ShieldCheck, Activity } from 'lucide-react';
+import {
+  Calculator,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+  ShieldCheck,
+  Activity,
+  FileDown,
+  FileSpreadsheet,
+  Printer
+} from 'lucide-react';
 
 export const TechnicalTab: React.FC = () => {
   // Bandwidth calculator state
@@ -11,6 +22,30 @@ export const TechnicalTab: React.FC = () => {
   const [fps, setFps] = useState(120);
   const [bitDepth, setBitDepth] = useState(12); // RAW12
   const [cameraCount, setCameraCount] = useState(1);
+
+  // Report Export Modal state
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [modalInitialInterfaces, setModalInitialInterfaces] = useState<{
+    mipi: boolean;
+    gmsl: boolean;
+    usb: boolean;
+  }>({
+    mipi: true,
+    gmsl: true,
+    usb: true
+  });
+  const [modalDefaultTab, setModalDefaultTab] = useState<'config' | 'preview'>('config');
+
+  const openExportModal = (
+    tab: 'config' | 'preview' = 'config',
+    interfaces?: { mipi: boolean; gmsl: boolean; usb: boolean }
+  ) => {
+    if (interfaces) {
+      setModalInitialInterfaces(interfaces);
+    }
+    setModalDefaultTab(tab);
+    setIsExportModalOpen(true);
+  };
 
   // Bandwidth calculation (bits/sec = width * height * fps * bitDepth * cameraCount * 1.15 protocol overhead)
   const bandwidthCalc = useMemo(() => {
@@ -41,19 +76,46 @@ export const TechnicalTab: React.FC = () => {
 
   return (
     <div className="space-y-8" id="technical-tab-content">
-      {/* Section Header */}
-      <div className="bg-white p-6 rounded-xl border border-gray-200/90 shadow-xs">
-        <h3 className="text-base font-bold text-gray-900 mb-1">
-          ⚡ 기술 성능 심층 분석: 대역폭, 지연 시간 및 물리 계층(PHY)
-        </h3>
-        <p className="text-xs text-gray-600 leading-relaxed">
-          카메라 인터페이스의 성능은 단순 링크 속도뿐 아니라, 데이터 전달의 확정적 지연성(Deterministic Latency),
-          호스트 CPU 점유 오버헤드, 그리고 센서 픽셀 파이프라인 구조에 의해 결정됩니다.
-        </p>
+      {/* Section Header with Report Export Toolbar */}
+      <div className="bg-white p-6 rounded-xl border border-gray-200/90 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h3 className="text-base font-bold text-gray-900 mb-1 flex items-center gap-2">
+            <span>⚡ 기술 성능 심층 분석: 대역폭, 지연 시간 및 물리 계층(PHY)</span>
+          </h3>
+          <p className="text-xs text-gray-600 leading-relaxed max-w-3xl">
+            카메라 인터페이스의 성능은 단순 링크 속도뿐 아니라, 데이터 전달의 확정적 지연성(Deterministic Latency),
+            호스트 CPU 점유 오버헤드, 그리고 센서 픽셀 파이프라인 구조에 의해 결정됩니다.
+          </p>
+        </div>
+
+        {/* Report Export Button Group */}
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => openExportModal('config')}
+            className="inline-flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs hover:shadow transition-all cursor-pointer"
+            title="사용자 선택 사양을 PDF 또는 CSV 보고서로 내보내기"
+          >
+            <FileDown className="w-4 h-4" />
+            <span>보고서 내보내기</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => openExportModal('preview')}
+            className="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200 transition-colors cursor-pointer"
+            title="인쇄용 A4 규격 PDF 미리보기 및 다운로드"
+          >
+            <Printer className="w-3.5 h-3.5 text-indigo-600" />
+            <span>PDF 미리보기</span>
+          </button>
+        </div>
       </div>
 
       {/* Key Specifications Table (Bandwidth, Cable Length, Power, Latency) */}
-      <TechnicalSpecSummaryTable />
+      <TechnicalSpecSummaryTable
+        onExportReport={(interfaces) => openExportModal('config', interfaces)}
+      />
 
       {/* Quantitative Bar Chart Comparison: Power Consumption & Max Cable Length */}
       <PowerAndDistanceBarChart />
@@ -332,6 +394,28 @@ export const TechnicalTab: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Technical Report Export Modal */}
+      <TechnicalReportExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        defaultTab={modalDefaultTab}
+        initialInterfaces={modalInitialInterfaces}
+        calculatorData={{
+          resLabel: bandwidthCalc.res.label,
+          width: bandwidthCalc.res.width,
+          height: bandwidthCalc.res.height,
+          fps,
+          bitDepth,
+          cameraCount,
+          gbps: bandwidthCalc.gbps,
+          mbytePerSec: bandwidthCalc.mbytePerSec,
+          mipiSupported: bandwidthCalc.mipiSupported,
+          gmslSingleSupported: bandwidthCalc.gmslSingleSupported,
+          gmslDualSupported: bandwidthCalc.gmslDualSupported,
+          usbSupported: bandwidthCalc.usbSupported
+        }}
+      />
     </div>
   );
 };
